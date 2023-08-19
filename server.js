@@ -188,15 +188,15 @@ app.delete('/user_delete', async (req, res) => {
 // author
 
 
-app.post('/new_author', async (req, res) => {
+app.post('/create_author', async (req, res) => {
   try {
     const { author_name , bio, profile_photo } = req.body;
 
     // Check if the author already exists
 
-    const existingUser = await authorModel.findOne({ email });
+    const existingUser = await authorModel.findOne({ author_name });
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: 'author already exists' });
     }
 
 
@@ -213,12 +213,23 @@ app.post('/new_author', async (req, res) => {
 
     const old_user = authorModel.find()
     const token = jwt.sign({ userId: old_user.id }, "secretKey", { expiresIn: '1h' });
-    res.status(201).json({ message: 'User registered successfully', token });
+    res.status(201).json({ message: 'author registered successfully', token });
 
 
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.get("/read_author", async (req, res) => {
+  try {
+    const user = await authorModel.find({});
+    res.send(user);
+    console.log(user);
+
+  } catch (err) {
+    console.log(err);
   }
 });
 
