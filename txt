@@ -1,0 +1,4 @@
+// username" , "email" , "password" , "hint" , "mobile_no"
+
+
+author_name" , "bio", "profile_photo"
