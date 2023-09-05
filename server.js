@@ -24,7 +24,7 @@ app.use(cors())
 require('dotenv').config();
 
 
-// routes/auth.js
+ // routes/auth.js
 const jwt = require('jsonwebtoken');
 
 
@@ -42,7 +42,7 @@ mongoose.connect(MONGODB_URI, {
 })
 
 // post
-app.get("/read_post", async (req, res) => {
+app.get("/read-post", async (req, res) => {
   try {
     const donor = await postModel.find({});
     res.send(donor);
@@ -54,7 +54,7 @@ app.get("/read_post", async (req, res) => {
 });
 
 
-app.post('/create_post', async (req, res) => {
+app.post('/create-post', async (req, res) => {
 
   const { title, content, imageUrl } = req.body;
   const newUser = new postModel({ title, content, imageUrl });
@@ -64,7 +64,6 @@ app.post('/create_post', async (req, res) => {
 
 });
 
-// user
 app.post('/user_login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -124,17 +123,28 @@ app.post('/user_register', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-app.get("/read_user", async (req, res) => {
-  try {
-    const user = await userModel.find({});
-    res.send(user);
-    console.log(user);
 
-  } catch (err) {
-    console.log(err);
+
+app.get('/profile', (req, res) => {
+  const token = req.headers.authorization;
+  if (!token) {
+      return res.status(401).json({ error: 'Authorization token missing' });
   }
+  jwt.verify(token, 'your-secret-key', async (err, decoded) => {
+      if (err) {
+          return res.status(403).json({ error: 'Token verification failed' });
+      }
+      const user = await userModel.findOne({ email: decoded.email });
+      if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+      }
+      const userProfile = {
+          username: user.username,
+          email: user.email
+      };
+      res.json(userProfile);
+  });
 });
-
 
 app.put('/user_update', async (req, res) => {
   const { username, email, password, hint, mobile_no, hint_option } = req.body;
